@@ -1,0 +1,28 @@
+{
+  "name": "haproxy-user-interface",
+  "version": "1.0.0",
+  "description": "A simple web interface to manage HAProxy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Faxendo/haproxy-user-interface.git"
+  },
+  "keywords": [
+    "haproxy"
+  ],
+  "author": "Nassim Lakebir <nassim@lakebir.fr>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Faxendo/haproxy-user-interface/issues"
+  },
+  "homepage": "https://github.com/Faxendo/haproxy-user-interface#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "haproxy": "^0.3.0",
+    "mongodb": "^3.1.10"
+  }
+}
