@@ -1,0 +1,144 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>HAProxy User Interface</title>
+
+        <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.darkly.min.css" />
+        <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css" />
+
+        <link rel="stylesheet" href="/css/style.css">
+
+        <script src="/lib/jquery/jquery.min.js"></script>
+        <script src="/lib/popper/popper.min.js"></script>
+        <script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+        <script src="/lib/angular/angular.min.js"></script>
+        <script src="/lib/momentjs/moment.min.js"></script>
+
+        <script src="/js/app.js"></script>
+    </head>
+    <body ng-app="HAProxyUI" ng-controller="MainCtrl" class="pb-5">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <a href="#" class="navbar-brand">HAProxy</a>
+            <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item" ng-class="activePage == 'stats' ? 'active' : ''">
+                        <a href="#" class="nav-link" ng-click="activePage = 'stats'">
+                            <span class="fa fa-chart-line"></span> Stats
+                        </a>
+                    </li>
+                    <li class="nav-item" ng-class="activePage == 'settings' ? 'active' : ''">
+                        <a href="#" class="nav-link" ng-click="activePage = 'settings'">
+                            <span class="fa fa-wrench"></span> Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container-fluid" ng-show="activePage == 'stats'">
+            <div class="row">
+                <div class="col-12">
+                    <h1>Backends</h1>
+                </div>
+                <div class="col-12" ng-repeat="b in backends()">
+                    <div class="card" ng-class="b.status == 'UP' ? 'border-success' : 'border-danger'">
+                        <div class="card-header">
+                            <div class="pull-left">
+                                <h3 class="p-0 m-0">{{b.pxname}} <small class="d-none d-md-inline">({{b.mode}} - {{b.algo}})</small></h3>
+                            </div>
+                            <div class="pull-right">
+                                <div class="dropdown">
+                                    <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                                        Active <span class="caret"></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a href="#" class="dropdown-item">
+                                            <span class="fa fa-fw fa-wrench"></span> Configure
+                                        </a>
+                                        <a href="#" class="dropdown-item">
+                                            <span class="fa fa-fw fa-stop"></span> Disable
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Server name</th>
+                                        <th class="d-none d-md-table-cell">Address</th>
+                                        <th class="d-none d-md-table-cell">Current Sessions</th>
+                                        <th class="d-none d-md-table-cell">Outgoing bytes</th>
+                                        <th class="d-none d-md-table-cell">Incoming bytes</th>
+                                        <th>Status</th>
+                                        <th class="d-none d-md-table-cell">Last status change</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="s in b.servers">
+                                        <td>{{s.svname}}</td>
+                                        <td class="d-none d-md-table-cell"><a ng-href='{{s.addr}}' target='_blank'>{{s.addr}}</a></td>
+                                        <td class="d-none d-md-table-cell">{{s.scur}}</td>
+                                        <td class="d-none d-md-table-cell">{{s.bout | convertBytes}}</td>
+                                        <td class="d-none d-md-table-cell">{{s.bin | convertBytes}}</td>
+                                        <td>
+                                            <span class="badge" ng-class="s.status == 'UP' ? 'badge-success' : 'badge-danger'">{{s.status}}</span>
+                                        </td>
+                                        <td class="d-none d-md-table-cell">{{s.lastchg | momentSecondsFrom}}</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h1>Frontends</h1>
+                </div>
+                <div class="col-12 col-md-4" ng-repeat="f in frontends()">
+                    <div class="card" ng-class="f.status == 'OPEN' ? 'border-success' : 'border-danger'">
+                        <div class="card-header">
+                            <div class="pull-left">
+                                <h3 class="p-0 m-0">{{f.pxname}}</h3>
+                            </div>
+                            <div class="pull-right">
+                                <button class="btn" ng-class="f.status == 'OPEN' ? 'btn-success' : 'btn-danger'">
+                                    {{f.status}}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col">
+                                    <span class="fa fa-upload"></span> {{f.bout | convertBytes}}
+                                </div>
+                                <div class="col">
+                                    <span class="fa fa-download"></span> {{f.bin | convertBytes}}
+                                </div>
+                                <div class="col">
+                                    <span class="fa fa-users"></span> {{f.conn_rate}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid" ng-show="activePage == 'settings'">
+            <div class="row">
+                <div class="col-12">
+                    <h1>Settings</h1>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

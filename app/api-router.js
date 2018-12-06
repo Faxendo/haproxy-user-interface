@@ -19,4 +19,10 @@ router.get('/', (req, res) => {
     });
 });
 
+router.get('/stats/', (req, res) => {
+    ha.stat('-1', '-1', '-1', (err, stats) => {
+        res.send(stats);
+    });
+});
+
 module.exports = router;
